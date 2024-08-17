@@ -1,0 +1,25 @@
+from flask import Flask, request, jsonify
+from ai_model import SchoolRecommender
+
+app = Flask(__name__)
+
+# Example data for the recommender
+data = [
+    {'school_name': 'School A', 'location': 1, 'academic_performance': 85, 'facilities': 8},
+    {'school_name': 'School B', 'location': 2, 'academic_performance': 90, 'facilities': 7},
+    {'school_name': 'School C', 'location': 1, 'academic_performance': 80, 'facilities': 6},
+]
+
+recommender = SchoolRecommender(data)
+
+@app.route('/recommend', methods=['POST'])
+def recommend():
+    user_preferences = request.json
+    if not user_preferences or not all(key in user_preferences for key in ['location', 'academic_performance', 'facilities']):
+        return jsonify({'error': 'Invalid input. Please provide location, academic_performance, and facilities.'}), 400
+
+    recommendations = recommender.recommend(user_preferences)
+    return jsonify(recommendations)
+
+if __name__ == '__main__':
+    app.run(debug=True)
